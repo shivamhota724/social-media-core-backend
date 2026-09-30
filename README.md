@@ -1,38 +1,55 @@
 # social-media-core-backend (RESTful Backend Architecture)
 
-A production-ready, containerized REST API backend engine optimized for low-latency relational data manipulation, token-based authorization, and secure multi-user sandboxing.
+A production-ready, containerized REST API backend engine for relational data manipulation and token-based authorization.
 
-🌐 Live System Documentation: https://onrender.com
+🌐 Live System Documentation: https://twitter-api-931t.onrender.com/docs
 
-## 🏗️ Core Architecture & Engineering Highlights
-* **Containerized Deployment Multi-Stack:** Orchestrated using Docker and Docker Compose to link an isolated Python runtime context with a separate PostgreSQL database instance.
-* **Granular Session Security:** Stateful authorization flow leveraging OAuth2 password specifications paired with cryptographically signed JWT access tokens.
-* **Data Layer Optimization & Windowing:** Relational architecture mapped through SQLAlchemy ORM, incorporating database indexing on foreign key lookups (`owner_id`) and high-throughput query pagination boundaries (`limit` and `skip` query bounds) to prevent table-scan resource exhaustion.
-* **Fail-Safe Multi-User Access Control:** Secure middleware layer explicitly verifying post-ownership strings, ensuring resource mutations (PUT/DELETE) strictly restrict cross-user structural modifications.
+## 🏗️ Core Architecture & Highlights
+* **Stack:** Python, FastAPI, SQLAlchemy ORM, and PostgreSQL/SQLite.
+* **Security:** Bcrypt password hashing and JWT Token Authentication using OAuth2.
+* **Authorization:** Ownership verification for updating and deleting posts.
 
-## 🛠️ Tech Stack & Systems Architecture
-* **Core Runtime:** Python 3.10+ / FastAPI / Uvicorn ASGI Server
-* **Persistence Layer:** PostgreSQL / SQLAlchemy ORM
-* **Security Layer:** Passlib (Bcrypt password hashing) / PyJWT / OAuth2 Password Bearer Flow
-* **Infrastructure Containerization:** Docker / Docker Compose
+## 🚀 Local System Initiation
 
-## 🚀 Optimized Local System Initiation
-1. Ensure Docker Desktop is active on your host system.
-2. Clone the repository and navigate into the project directory:
+1. Clone the repository and navigate into the project directory:
    ```bash
    git clone https://github.com
-   cd twitter_api
+   cd social-media-core-backend
    ```
-3. Initialize the multi-container database and server ecosystem:
+2. Create and activate a python virtual environment:
+   * **macOS / Linux:**
+     ```bash
+     python -m venv venv && source venv/bin/activate
+     ```
+   * **Windows:**
+     ```bash
+     python -m venv venv && venv\Scripts\activate
+     ```
+3. Install dependencies and run the server:
    ```bash
-   docker compose up --build
+   pip install -r requirements.txt
+   uvicorn main:app --reload
    ```
-4. Access the auto-generated, interactive OpenAPI/Swagger interfaces at: `http://localhost:8000/docs`
 
-## 📊 Database Schema Relationships
-* **Users Table:** Handles core profiles with columns `id` (Primary Key), `email` (Unique String Index), and `password` (Hashed String Block).
-* **Posts Table:** Handles structural records with columns `id` (Primary Key), `content` (String), and `owner_id` (Indexed Foreign Key tied to `users.id` with a cascading delete parameter).
+## 🌐 API Endpoints
 
-## 🚀 Future Roadmap Implementation
-* Database schema migrations tracking using Alembic.
-* Automated continuous integration/deployment (CI/CD) pipelines using GitHub Actions.
+### Authentication
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| **POST** | `/users` | Register a new user |
+| **POST** | `/login` | Login and receive JWT token |
+
+### Posts
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| **GET** | `/posts` | Get all posts |
+| **GET** | `/posts/{post_id}` | Get a single post |
+| **POST** | `/posts` | Create a new post |
+| **PUT** | `/posts/{post_id}` | Update a post |
+| **DELETE** | `/posts/{post_id}` | Delete a post |
+
+---
+**Author:** Shivam Hota  
+**GitHub Profile:** [shivamhota724](https://github.com/shivamhota724)

@@ -1,4 +1,4 @@
-# Containerized Social Media Engine (RESTful Backend Architecture)
+# social-media-core-backend (RESTful Backend Architecture)
 
 A production-ready, containerized REST API backend engine optimized for low-latency relational data manipulation, token-based authorization, and secure multi-user sandboxing.
 

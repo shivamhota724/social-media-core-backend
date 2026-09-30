@@ -1,14 +1,20 @@
+import os
+import time
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.exc import OperationalError
 
-import os
+# 1. Grab the URL injected by Docker Compose
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+psycopg2://shivamhota@localhost/twitter_db"
+# 2. Add connection timeout arguments to the driver
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"connect_timeout": 5}
 )
-engine = create_engine(DATABASE_URL)
+
 SessionLocal = sessionmaker(bind=engine)
+
 def get_db():
     db = SessionLocal()
     try:
@@ -18,7 +24,23 @@ def get_db():
 
 Base = declarative_base()
 
-
+# 3. Robust table creation loop to handle Docker initialization lag
 from models import Post, User
-Base.metadata.create_all(bind=engine)
 
+def initialize_database():
+    retries = 5
+    while retries > 0:
+        try:
+            Base.metadata.create_all(bind=engine)
+            print("Successfully connected to the database and initialized schemas!")
+            break
+        except OperationalError:
+            retries -= 1
+            print(f"Database is still booting up... Retrying in 2 seconds ({retries} retries left)")
+            time.sleep(2)
+            
+    if retries == 0:
+        raise Exception("Could not connect to the database container.")
+
+# Run the initialization loop safely
+initialize_database()

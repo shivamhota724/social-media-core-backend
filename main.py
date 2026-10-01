@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, HTTPException, Query, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import List
@@ -9,7 +10,19 @@ from schemas import CreatePost, PostResponse, CreateUser, UserResponse, UserLogi
 from utils import hash, verify
 from oauth2 import create_access_token, get_current_user
 
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
+import redis
+
 app = FastAPI()
+
+
+@app.on_event("startup")
+async def startup():
+    
+    redis_client = redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
+    FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
 
 
 @app.post("/users", response_model=UserResponse)
@@ -110,6 +123,7 @@ def get_posts(
 
 
 @app.get("/posts/{post_id}", response_model=PostResponse)
+@cache(expire=60) # Caches the database result in memory for 60 seconds!
 def get_post(
     post_id: int,  
     db: Session = Depends(get_db)
